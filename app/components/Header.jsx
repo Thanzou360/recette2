@@ -10,7 +10,7 @@ function LoginPopup({ isOpen, onClose, onLogin }) {
     setError('');
 
     try {
-      const response = await fetch('/api/utilisateurs/login', {
+      const response = await fetch('https://reccette-de-cuisine.onrender.com', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -87,7 +87,7 @@ function SignupPopup({ isOpen, onClose }) {
     setError('');
 
     try {
-      const response = await fetch('/api/utilisateurs/register', {
+      const response = await fetch('https://reccette-de-cuisine.onrender.com', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
