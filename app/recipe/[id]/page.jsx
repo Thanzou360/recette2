@@ -1,14 +1,13 @@
-
 import Image from 'next/image';
 
 async function getData(id) {
   const res = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`);
   if (!res.ok) {
-    // This will activate the closest `error.js` Error Boundary
     throw new Error('Failed to fetch data');
   }
   return res.json();
 }
+
 export default async function Page({ params }) {
   const { id } = params;
 
@@ -16,25 +15,25 @@ export default async function Page({ params }) {
   const data = await getData(id);
 
   return (
-    <div className="container mx-auto my-20">
-      <div className="flex border-2 border-gray-300 cursor-pointer hover:border-black p-4">
-        {/* Image Section on the Left */}
-        <div className="relative w-[50%] h-[500px] mr-8">
+    
+    <div className="container mx-auto my-10 px-4">
+      <div className="flex flex-col md:flex-row border-2 border-gray-300 cursor-pointer hover:border-black p-4">
+        
+        <div className="relative w-full md:w-1/2 h-[300px] md:h-[500px] mb-4 md:mb-0">
           <Image
             src={data?.meals[0]?.strMealThumb}
             layout="fill"
             objectFit="cover"
             alt="Meal Image"
+            className="rounded"
           />
         </div>
 
-        {/* Information Section on the Right */}
-        <div className="w-[50%]">
+        <div className="w-full md:w-1/2">
           <h1 className="bg-white py-4 text-gray-500 font-semibold text-2xl text-center mb-4">
             {data?.meals[0]?.strMeal}
           </h1>
 
-          {/* Ingredients Card */}
           <div className="bg-white p-4 mb-4 border border-gray-300 rounded">
             <h2 className="text-xl font-semibold mb-2">Ingredients:</h2>
             {Array.from({ length: 20 }, (_, i) => i + 1).map((index) => {
@@ -53,7 +52,6 @@ export default async function Page({ params }) {
             })}
           </div>
 
-          {/* Steps Card */}
           <div className="bg-white p-4 mb-4 border border-gray-300 rounded">
             <h2 className="text-xl font-semibold mb-2">Steps:</h2>
             <ol className="list-decimal pl-4">
@@ -63,7 +61,6 @@ export default async function Page({ params }) {
             </ol>
           </div>
 
-          {/* YouTube Video */}
           {data?.meals[0]?.strYoutube && (
             <div className="mb-4">
               <iframe
