@@ -1,11 +1,34 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 function LoginPopup({ isOpen, onClose, onLogin }) {
-  const handleSubmit = (event) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // Logique de connexion ici
-    onLogin(); // Appeler la fonction pour mettre à jour l'état de connexion
-    onClose(); // Fermer la popup après connexion
+    setError('');
+
+    try {
+      const response = await fetch('/api/utilisateurs/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: email, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Identifiants invalides');
+      }
+
+      const data = await response.json();
+      localStorage.setItem('token', data.token); // Stocker le jeton
+      onLogin(); // Mettre à jour l'état de connexion
+      onClose(); // Fermer la popup après connexion
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   return (
@@ -13,12 +36,15 @@ function LoginPopup({ isOpen, onClose, onLogin }) {
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
         <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
           <h2 className="text-2xl font-bold text-center mb-6">Connexion</h2>
+          {error && <p className="text-red-500 text-center">{error}</p>}
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700" htmlFor="email">Email</label>
               <input
                 type="email"
                 id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-yellow-500 focus:border-yellow-500"
                 placeholder="Entrez votre adresse email"
                 required
@@ -29,6 +55,8 @@ function LoginPopup({ isOpen, onClose, onLogin }) {
               <input
                 type="password"
                 id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-yellow-500 focus:border-yellow-500"
                 placeholder="Entrez votre mot de passe"
                 required
@@ -49,17 +77,48 @@ function LoginPopup({ isOpen, onClose, onLogin }) {
 }
 
 function SignupPopup({ isOpen, onClose }) {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setError('');
+
+    try {
+      const response = await fetch('/api/utilisateurs/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: email, name, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de l\'inscription');
+      }
+
+      onClose(); // Fermer la popup après inscription
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   return (
     isOpen && (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
         <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
           <h2 className="text-2xl font-bold text-center mb-6">Inscription</h2>
-          <form>
+          {error && <p className="text-red-500 text-center">{error}</p>}
+          <form onSubmit={handleSubmit}>
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700" htmlFor="name">Nom</label>
               <input
                 type="text"
                 id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-yellow-500 focus:border-yellow-500"
                 placeholder="Entrez votre nom"
                 required
@@ -70,6 +129,8 @@ function SignupPopup({ isOpen, onClose }) {
               <input
                 type="email"
                 id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-yellow-500 focus:border-yellow-500"
                 placeholder="Entrez votre adresse email"
                 required
@@ -80,6 +141,8 @@ function SignupPopup({ isOpen, onClose }) {
               <input
                 type="password"
                 id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-yellow-500 focus:border-yellow-500"
                 placeholder="Entrez votre mot de passe"
                 required
@@ -102,8 +165,8 @@ function SignupPopup({ isOpen, onClose }) {
 function Header() {
   const [showLoginPopup, setShowLoginPopup] = useState(false);
   const [showSignupPopup, setShowSignupPopup] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // État pour savoir si l'utilisateur est connecté
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // État pour contrôler la sidebar
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const sidebarRef = useRef(null);
 
   const toggleLoginPopup = () => {
@@ -118,7 +181,7 @@ function Header() {
     if (!isLoggedIn) {
       toggleLoginPopup();
     } else {
-      window.location.href = '/ajouter-recette'; // Remplacez par le chemin correct vers le formulaire
+      window.location.href = '/ajouter-recette';
     }
   };
 
@@ -152,7 +215,7 @@ function Header() {
         <nav className='hidden md:flex flex-grow justify-center items-center space-x-4'>
           <a href="#" className='text-white hover:text-yellow-400 transition duration-300'>Accueil</a>
           <a href="#" className='text-white hover:text-yellow-400 transition duration-300'>Menu</a>
-          <a onClick={handleAddRecipe} className='text-white cursor-pointer hover:text-yellow-400 transition duration-300'>Ajouter une Recette</a>
+          <a href='../recipe/recette.jsx' onClick={handleAddRecipe} className='text-white cursor-pointer hover:text-yellow-400 transition duration-300'>Ajouter une Recette</a>
           <a href="#" className='text-white hover:text-yellow-400 transition duration-300'>Mes Recettes</a>
         </nav>
         <div className='hidden md:flex space-x-4'>
@@ -162,7 +225,7 @@ function Header() {
               <button onClick={toggleSignupPopup} className='bg-white text-black px-4 py-2 rounded hover:bg-blue-400 transition duration-300'>Inscription</button>
             </>
           ) : (
-            <button onClick={() => setIsLoggedIn(false)} className='bg-red-500 text-white px-4 py-2 rounded hover:bg-red-400 transition duration-300'>Déconnexion</button>
+            <button onClick={() => { setIsLoggedIn(false); localStorage.removeItem('token'); }} className='bg-red-500 text-white px-4 py-2 rounded hover:bg-red-400 transition duration-300'>Déconnexion</button>
           )}
         </div>
       </div>
@@ -184,7 +247,7 @@ function Header() {
                     <button onClick={toggleSignupPopup} className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-400 transition duration-300'>Inscription</button>
                   </>
                 ) : (
-                  <button onClick={() => setIsLoggedIn(false)} className='bg-red-500 text-white px-4 py-2 rounded hover:bg-red-400 transition duration-300'>Déconnexion</button>
+                  <button onClick={() => { setIsLoggedIn(false); localStorage.removeItem('token'); }} className='bg-red-500 text-white px-4 py-2 rounded hover:bg-red-400 transition duration-300'>Déconnexion</button>
                 )}
               </div>
             </nav>
