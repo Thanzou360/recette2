@@ -23,9 +23,9 @@ function LoginPopup({ isOpen, onClose, onLogin }) {
       }
 
       const data = await response.json();
-      localStorage.setItem('token', data.token); // Stocker le jeton
-      onLogin(); // Mettre à jour l'état de connexion
-      onClose(); // Fermer la popup après connexion
+      localStorage.setItem('token', data.token); 
+      onLogin(); 
+      onClose(); 
     } catch (err) {
       setError(err.message);
     }
@@ -99,7 +99,7 @@ function SignupPopup({ isOpen, onClose }) {
         throw new Error('Erreur lors de l\'inscription');
       }
 
-      onClose(); // Fermer la popup après inscription
+      onClose();
     } catch (err) {
       setError(err.message);
     }
@@ -205,7 +205,7 @@ function Header() {
 
   return (
     <div>
-      <div className='flex justify-between items-center bg-black p-5'>
+      <div className='flex justify-between w-full items-center bg-black p-5'>
         <h1 className='text-3xl font-semibold text-white'>Recipes</h1>
         <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className='text-white md:hidden focus:outline-none'>
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -230,7 +230,7 @@ function Header() {
         </div>
       </div>
 
-      {/* Sidebar */}
+      
       {isSidebarOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-75 z-50 md:hidden">
           <div ref={sidebarRef} className="bg-white w-64 h-full p-5">
@@ -255,7 +255,7 @@ function Header() {
         </div>
       )}
 
-      {/* Popups */}
+      
       <LoginPopup isOpen={showLoginPopup} onClose={toggleLoginPopup} onLogin={() => setIsLoggedIn(true)} />
       <SignupPopup isOpen={showSignupPopup} onClose={toggleSignupPopup} />
     </div>

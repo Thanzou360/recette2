@@ -11,7 +11,7 @@ async function getData(id) {
 export default async function Page({ params }) {
   const { id } = params;
 
-  // Fetch data
+ 
   const data = await getData(id);
 
   return (

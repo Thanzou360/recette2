@@ -15,7 +15,7 @@ function CreateRecipePopup({ isOpen, onClose, userId }) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`, // Inclure le jeton d'authentification
+          'Authorization': `Bearer ${localStorage.getItem('token')}`, 
         },
         body: JSON.stringify({ title, description, image, userId }),
       });
@@ -25,12 +25,12 @@ function CreateRecipePopup({ isOpen, onClose, userId }) {
         throw new Error(errorData.message || 'Erreur lors de la création de la recette');
       }
 
-      // Optionnel : Récupérer la recette créée si besoin
+      
       const createdRecipe = await response.json();
-      console.log('Recette créée:', createdRecipe); // Afficher la recette créée dans la console
+      console.log('Recette créée:', createdRecipe); 
 
-      onClose(); // Fermer la popup après la création
-      // Réinitialiser les champs
+      onClose(); 
+      
       setTitle('');
       setDescription('');
       setImage('');
